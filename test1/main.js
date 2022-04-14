@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { OrbitControls } from "./jsm/controls/OrbitControls.js"
+import { OrbitControls } from "./jsm/controls/OrbitControls.js";
+
 
 let scene, camera, renderer, pointLight, controls;
 
