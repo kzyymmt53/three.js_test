@@ -53,6 +53,25 @@ scene.add(mesh1,mesh2,mesh3, mesh4);
 
 const meshes = [mesh1, mesh2, mesh3, mesh4];
 
+//パーティクル
+let particlesGeometory = new THREE.BufferGeometry();
+let particlesCount = 700;
+let positionArray = new Float32Array(particlesCount * 3);
+
+for(let i = 0; i < particlesCount * 3; i++){
+  positionArray[i] = (Math.random() - 0.5) * 10;
+}
+
+particlesGeometory.setAttribute("position", new THREE.BufferAttribute(positionArray, 3));
+
+const particlesMaterial = new THREE.PointsMaterial({
+  size: 0.025,
+  color: "#ffffff",
+});
+
+const particles = new THREE.Points(particlesGeometory, particlesMaterial);
+scene.add(particles);
+
 const directionalLight = new THREE.DirectionalLight("#ffffff", 4);
 directionalLight.position.set(0.5,1,0);
 scene.add(directionalLight);
@@ -74,6 +93,46 @@ window.addEventListener("resize", () => {
 
 const clock = new THREE.Clock();
 
+let speed = 0;
+let rotation = 0;
+//ホイール
+window.addEventListener("wheel", (event) => {
+  speed += event.deltaY * 0.0002;
+});
+
+function rot() {
+  rotation += speed;
+  speed *= 0.93;
+  
+  //ジオメトリ回転
+  mesh1.position.x = 2 + 3.8 * Math.cos(rotation);
+  mesh1.position.z = -3 + 3.8 * Math.sin(rotation);
+
+  mesh2.position.x = 2 + 3.8 * Math.cos(rotation + Math.PI /2);
+  mesh2.position.z = -3 + 3.8 * Math.sin(rotation + Math.PI /2);
+
+  mesh3.position.x = 2 + 3.8 * Math.cos(rotation + Math.PI);
+  mesh3.position.z = -3 + 3.8 * Math.sin(rotation + Math.PI);
+
+  mesh4.position.x = 2 + 3.8 * Math.cos(rotation + 3*(Math.PI/2));
+  mesh4.position.z = -3 + 3.8 * Math.sin(rotation + 3*(Math.PI/2));
+
+
+  window.requestAnimationFrame(rot);
+}
+
+rot();
+
+//カーソルの位置
+const cursor = {};
+cursor.x = 0;
+cursor.y = 0;
+
+window.addEventListener("mousemove", (event) => {
+  cursor.x = event.clientX / sizes.width - 0.5;
+  cursor.y = event.clientY / sizes.height - 0.5;
+});
+
 const animate = () => {
   renderer.render(scene,camera);
 
@@ -83,6 +142,10 @@ const animate = () => {
     mesh.rotation.x += 0.1 * getDeltaTime;
     mesh.rotation.y += 0.12 * getDeltaTime;
   }
+
+  //カメラの制御
+  camera.position.x += cursor.x * getDeltaTime * 1.5;
+  camera.position.y += -1 * cursor.y * getDeltaTime * 1.5;
   
   window.requestAnimationFrame(animate);
 };
